@@ -431,7 +431,7 @@ int removeCustomGesture(u8 gestureID)
 	index = gestureID - GESTURE_CUSTOM_OFFSET;
 	log_debug("%s Starting Custom Gesture Removing procedure...\n", tag);
 
-	if (gestureID != GES_ID_CUST1 && gestureID != GES_ID_CUST2 && gestureID != GES_ID_CUST3 && gestureID != GES_ID_CUST4 && gestureID && GES_ID_CUST5) {
+	if (gestureID != GES_ID_CUST1 && gestureID != GES_ID_CUST2 && gestureID != GES_ID_CUST3 && gestureID != GES_ID_CUST4 && gestureID != GES_ID_CUST5) {
 		log_error("%s removeCustomGesture: Invalid size or Custom GestureID (%02X)! ERROR %08X\n", tag, gestureID, ERROR_OP_NOT_ALLOW);
 		return ERROR_OP_NOT_ALLOW;
 	}
