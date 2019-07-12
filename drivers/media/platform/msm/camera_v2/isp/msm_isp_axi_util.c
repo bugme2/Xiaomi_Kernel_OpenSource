@@ -1,4 +1,5 @@
 /* Copyright (c) 2013-2020, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2019 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -841,6 +842,7 @@ static void msm_isp_sync_dual_cam_frame_id(
 		return;
 	}
 
+    WARN_ON(ms_res->dual_sync_mode == MSM_ISP_DUAL_CAM_ASYNC);
 	/* find highest frame id */
 	for (i = 0; i < MAX_VFE * VFE_SRC_MAX; i++) {
 		if (ms_res->src_info[i] == NULL)
@@ -917,7 +919,7 @@ void msm_isp_increment_frame_id(struct vfe_device *vfe_dev,
 			 */
 			if (ms_res->src_sof_mask & (1 <<
 				src_info->dual_hw_ms_info.index)) {
-				pr_err_ratelimited("Frame out of sync on vfe %d\n",
+				pr_err("Frame out of sync on vfe %d\n",
 					vfe_dev->pdev->id);
 				/* Notify to do reconfig at SW sync drop*/
 				vfe_dev->isp_page->dual_cam_drop_detected = 1;
@@ -942,6 +944,8 @@ void msm_isp_increment_frame_id(struct vfe_device *vfe_dev,
 							sync_state =
 							MSM_ISP_DUAL_CAM_ASYNC;
 				}
+				ms_res->src_sof_mask = 0;
+				ms_res->active_src_mask = 1 << src_info->dual_hw_ms_info.index;
 			}
 			ms_res->src_sof_mask |= (1 <<
 					src_info->dual_hw_ms_info.index);
@@ -3628,20 +3632,18 @@ static int msm_isp_request_frame(struct vfe_device *vfe_dev,
 		) {
 		pr_debug("%s:%d invalid time to request frame %d try drop_reconfig\n",
 			__func__, __LINE__, frame_id);
-		vfe_dev->isp_page->drop_reconfig = 1;
-		return 0;
+		goto error;
 	} else if ((vfe_dev->axi_data.src_info[frame_src].active) &&
 			((frame_id ==
 			vfe_dev->axi_data.src_info[frame_src].frame_id) ||
 			(frame_id == vfe_dev->irq_sof_id)) &&
 			(stream_info->undelivered_request_cnt <=
 				MAX_BUFFERS_IN_HW)) {
-		vfe_dev->isp_page->drop_reconfig = 1;
-		pr_debug("%s: vfe_%d request_frame %d cur frame id %d pix %d try drop_reconfig\n",
+		pr_debug("%s: vfe_%d request_frame %d cur frame id %d pix %d\n",
 			__func__, vfe_dev->pdev->id, frame_id,
 			vfe_dev->axi_data.src_info[VFE_PIX_0].frame_id,
 			vfe_dev->axi_data.src_info[VFE_PIX_0].active);
-		return 0;
+		goto error;
 	} else if ((vfe_dev->axi_data.src_info[frame_src].active && (frame_id !=
 		vfe_dev->axi_data.src_info[frame_src].frame_id + vfe_dev->
 		axi_data.src_info[frame_src].sof_counter_step)) ||

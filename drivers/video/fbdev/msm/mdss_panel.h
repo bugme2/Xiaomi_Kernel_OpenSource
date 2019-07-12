@@ -1,4 +1,5 @@
 /* Copyright (c) 2008-2020, The Linux Foundation. All rights reserved.
+ * Copyright (C) 2019 XiaoMi, Inc.
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License version 2 and
@@ -293,6 +294,7 @@ enum mdss_intf_events {
 	MDSS_EVENT_DSI_CMDLIST_KOFF,
 	MDSS_EVENT_ENABLE_PARTIAL_ROI,
 	MDSS_EVENT_DSC_PPS_SEND,
+	MDSS_EVENT_DISPPARAM,
 	MDSS_EVENT_DSI_STREAM_SIZE,
 	MDSS_EVENT_DSI_UPDATE_PANEL_DATA,
 	MDSS_EVENT_REGISTER_RECOVERY_HANDLER,
@@ -802,6 +804,8 @@ struct mdss_panel_info {
 	u32 deep_color;
 	bool is_ce_mode; /* CE video format */
 	u8 csc_type;
+	int esd_err_irq_gpio;
+	int esd_err_irq;
 	struct mdss_rect roi;
 	struct mdss_dsi_dual_pu_roi dual_roi;
 	int pwm_pmic_gpio;
@@ -815,6 +819,7 @@ struct mdss_panel_info {
 	bool ulps_suspend_enabled;
 	bool panel_ack_disabled;
 	bool esd_check_enabled;
+	bool esd_panel_onoff_tpg;
 	bool allow_phy_power_off;
 	char dfps_update;
 	/* new requested bitclk before it is updated in hw */
@@ -846,6 +851,7 @@ struct mdss_panel_info {
 	bool esd_rdy;
 	u32 partial_update_supported; /* value from dts if pu is supported */
 	u32 partial_update_enabled; /* is pu currently allowed */
+	u32 dispparam_enabled;
 	u32 dcs_cmd_by_left;
 	u32 partial_update_roi_merge;
 	struct ion_handle *splash_ihdl;
@@ -895,6 +901,10 @@ struct mdss_panel_info {
 	struct mdss_mdp_pp_tear_check te;
 	struct mdss_mdp_pp_tear_check te_cached;
 
+	uint32_t panel_paramstatus;
+	uint32_t panel_on_param;
+	uint32_t panel_on_dimming_delay;
+
 	/*
 	 * Value of 2 only when single DSI is configured with 2 DSC
 	 * encoders. When 2 encoders are used, currently both use
@@ -916,6 +926,7 @@ struct mdss_panel_info {
 	struct edp_panel_info edp;
 
 	bool is_dba_panel;
+	bool is_oled_hbm_mode;
 
 	/*
 	 * Delay(in ms) to accommodate s/w delay while
@@ -937,6 +948,15 @@ struct mdss_panel_info {
 
 	/* esc clk recommended for the panel */
 	u32 esc_clk_rate_hz;
+
+	/* check ccbb enabled  */
+	bool ccbb_enabled;
+
+	/* check brightness notify enabled*/
+	bool bl_notify_enabled;
+
+	/* check disable cabc by panel off*/
+	bool disable_cabc;
 };
 
 struct mdss_panel_timing {
