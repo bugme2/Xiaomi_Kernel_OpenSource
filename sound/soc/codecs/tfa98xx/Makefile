@@ -34,3 +34,5 @@ ifdef TFA_DEBUG
 EXTRA_CFLAGS += -DTFA_DEBUG -DDEBUG
 snd-soc-tfa98xx-objs += tfa_debug.o
 endif
+
+EXTRA_CFLAGS += -Werror -Wno-enum-conversion
