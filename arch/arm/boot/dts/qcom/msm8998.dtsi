@@ -293,7 +293,7 @@
 					dev = "/dev/block/platform/soc/1da4000.ufshc/by-name/system";
 					type = "ext4";
 					mnt_flags = "ro,barrier=1,discard";
-					fsmgr_flags = "wait,verify";
+					fsmgr_flags = "wait";
 					status = "ok";
 				};
 			};
@@ -2501,10 +2501,10 @@
 		qcom,sensor-id = <1>;
 		qcom,poll-ms = <100>;
 		qcom,therm-reset-temp = <115>;
-		qcom,core-limit-temp = <70>;
-		qcom,core-temp-hysteresis = <10>;
+		qcom,core-limit-temp = <95>;
+		qcom,core-temp-hysteresis = <5>;
 		qcom,hotplug-temp = <105>;
-		qcom,hotplug-temp-hysteresis = <20>;
+		qcom,hotplug-temp-hysteresis = <10>;
 		qcom,online-hotplug-core;
 		qcom,synchronous-cluster-id = <0 1>;
 		qcom,synchronous-cluster-map = <0 4 &CPU0 &CPU1 &CPU2 &CPU3>,
